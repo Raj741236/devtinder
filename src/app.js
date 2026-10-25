@@ -2,28 +2,21 @@ const express = require("express");
 
 const app = express();
 
-app.use(
-  "/user",
-  (req, res, next) => {
-    console.log("Router 1");
-    // res.send("Response 1");
-    next();
-  },
-  (req, res, next) => {
-    console.log("Router 2");
-    // res.send("Response 2");
-    next();
-  },
-  (req, res, next) => {
-    console.log("Router 3");
-    // res.send("Response 3");
-    next();
-  },
-  (req, res, next) => {
-    console.log("Router 4");
-    res.send("Response 4");
-  },
-);
+const { adminAuth, userAuth } = require("./middlewares/auth");
+
+app.use("/admin", adminAuth);
+
+app.use("/user", userAuth, (req, res) => {
+  res.send("Hello user");
+});
+
+app.get("/admin/getAllUser", (req, res) => {
+  res.send("Fetched all user data successfully");
+});
+
+app.get("/admin/deleteAllUser", (req, res) => {
+  res.send("Deleted all user data successfully");
+});
 
 app.listen(7777, () => {
   console.log("Server is running successfully");
