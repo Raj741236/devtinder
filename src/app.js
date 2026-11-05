@@ -16,6 +16,8 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+//GET a user from database
+
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
 
@@ -31,11 +33,37 @@ app.get("/user", async (req, res) => {
     res.status(400).send("Issue occured saving the data");
   }
 });
-
+//GET all users
 app.get("/feed", async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
+  } catch (err) {
+    res.status(400).send("Issue occured saving the data");
+  }
+});
+
+//DELETE a user
+
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+
+  try {
+    await User.findByIdAndDelete(userId);
+    res.send("User deleted successfully");
+  } catch (err) {
+    res.status(400).send("Issue occured saving the data");
+  }
+});
+
+//Update a user
+
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const updateData = req.body;
+  try {
+    await User.findByIdAndUpdate(userId, updateData);
+    res.send("User modified data successfully");
   } catch (err) {
     res.status(400).send("Issue occured saving the data");
   }
