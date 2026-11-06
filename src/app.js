@@ -12,7 +12,7 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("User created successfully");
   } catch (err) {
-    res.status(400).send("Issue occured saving the data");
+    res.status(400).send("Issue occured saving the data" + err.message);
   }
 });
 
@@ -30,7 +30,7 @@ app.get("/user", async (req, res) => {
       res.status(404).send("User not Found");
     }
   } catch (err) {
-    res.status(400).send("Issue occured saving the data");
+    res.status(400).send("Issue occured saving the data" + err.message);
   }
 });
 //GET all users
@@ -39,7 +39,7 @@ app.get("/feed", async (req, res) => {
     const users = await User.find({});
     res.send(users);
   } catch (err) {
-    res.status(400).send("Issue occured saving the data");
+    res.status(400).send("Issue occured saving the data" + err.message);
   }
 });
 
@@ -52,7 +52,7 @@ app.delete("/user", async (req, res) => {
     await User.findByIdAndDelete(userId);
     res.send("User deleted successfully");
   } catch (err) {
-    res.status(400).send("Issue occured saving the data");
+    res.status(400).send("Issue occured saving the data" + err.message);
   }
 });
 
@@ -62,10 +62,10 @@ app.patch("/user", async (req, res) => {
   const userId = req.body.userId;
   const updateData = req.body;
   try {
-    await User.findByIdAndUpdate(userId, updateData);
+    await User.findByIdAndUpdate(userId, updateData, { runValidators: true });
     res.send("User modified data successfully");
   } catch (err) {
-    res.status(400).send("Issue occured saving the data");
+    res.status(400).send("Issue occured saving the data" + err.message);
   }
 });
 
