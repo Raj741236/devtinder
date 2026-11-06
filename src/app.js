@@ -58,10 +58,17 @@ app.delete("/user", async (req, res) => {
 
 //Update a user
 
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params.userId;
   const updateData = req.body;
   try {
+    const UPDATES_ALLOWED = ["age", "photoUrl", "skills", "about", "gender"];
+    const isUpdateAllowed = Object.keys(updateData).every((key) =>
+      UPDATES_ALLOWED.includes(key),
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed");
+    }
     await User.findByIdAndUpdate(userId, updateData, { runValidators: true });
     res.send("User modified data successfully");
   } catch (err) {

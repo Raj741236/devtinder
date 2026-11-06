@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,6 +20,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
+      validate: {
+        validator: (value) => {
+          if (!validator.isEmail(value)) {
+            throw new Error("Enter a valid Email ID");
+          }
+        },
+      },
     },
     password: {
       type: String,
@@ -54,6 +62,13 @@ const userSchema = new mongoose.Schema(
     },
     skills: {
       type: [String],
+      validate: {
+        validator: (value) => {
+          if (value?.length >= 10) {
+            throw new Error("Skills are restricted to only 10");
+          }
+        },
+      },
     },
   },
   { timestamps: true },
