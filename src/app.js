@@ -5,6 +5,7 @@ const User = require("./models/user");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -54,81 +55,19 @@ app.post("/login", async (req, res) => {
 
 //GET profile API
 
-app.get("/profile", async (req, res) => {
-  console.log(req.cookies);
-
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const decoderId = await jwt.verify(req.cookies.token, "DEV-TINDER$123");
-
-    const user = await User.findById(decoderId._id);
-
-    if (!user) {
-      throw new Error("Invalid user token");
-    } else {
-      res.send(user);
-    }
+    res.send(req.user);
   } catch (err) {
     res.status(400).send("Error:" + err.message);
   }
 });
 
-//GET a user from database
-
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.emailId;
-
+app.get("/sendConnectionRequest", userAuth, (req, res) => {
   try {
-    const user = await User.find({ emailId: userEmail });
-
-    if (user.length > 0) {
-      res.send(user);
-    } else {
-      res.status(404).send("User not Found");
-    }
+    res.send("Connection request sent");
   } catch (err) {
-    res.status(400).send("Issue occured saving the data" + err.message);
-  }
-});
-//GET all users
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(400).send("Issue occured saving the data" + err.message);
-  }
-});
-
-//DELETE a user
-
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-
-  try {
-    await User.findByIdAndDelete(userId);
-    res.send("User deleted successfully");
-  } catch (err) {
-    res.status(400).send("Issue occured saving the data" + err.message);
-  }
-});
-
-//Update a user
-
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  const updateData = req.body;
-  try {
-    const UPDATES_ALLOWED = ["age", "photoUrl", "skills", "about", "gender"];
-    const isUpdateAllowed = Object.keys(updateData).every((key) =>
-      UPDATES_ALLOWED.includes(key),
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("Update not allowed");
-    }
-    await User.findByIdAndUpdate(userId, updateData, { runValidators: true });
-    res.send("User modified data successfully");
-  } catch (err) {
-    res.status(400).send("Issue occured saving the data" + err.message);
+    res.status(400).send("Error:" + err.message);
   }
 });
 
