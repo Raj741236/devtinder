@@ -3,8 +3,11 @@ const { connectionDB } = require("./config/database");
 const app = express();
 const User = require("./models/user");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   const { firstName, lastName, emailId, password } = req.body;
@@ -40,7 +43,29 @@ app.post("/login", async (req, res) => {
     if (!isValidPassword) {
       throw new Error("Invalid Crentials password");
     } else {
+      const jwtToken = await jwt.sign({ _id: user._id }, "DEV-TINDER$123");
+      res.cookie("token", jwtToken);
       res.send("User logined successfully");
+    }
+  } catch (err) {
+    res.status(400).send("Error:" + err.message);
+  }
+});
+
+//GET profile API
+
+app.get("/profile", async (req, res) => {
+  console.log(req.cookies);
+
+  try {
+    const decoderId = await jwt.verify(req.cookies.token, "DEV-TINDER$123");
+
+    const user = await User.findById(decoderId._id);
+
+    if (!user) {
+      throw new Error("Invalid user token");
+    } else {
+      res.send(user);
     }
   } catch (err) {
     res.status(400).send("Error:" + err.message);
