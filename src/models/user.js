@@ -93,6 +93,18 @@ userSchema.methods.comparePassword = async function (passwordInputByUser) {
   return isPasswordValid;
 };
 
+userSchema.methods.compareNewPassword = async function (newPassword) {
+  const user = this;
+  const oldUserPasswordHash = user.password;
+
+  const isIdenticalPassword = await bcrypt.compare(
+    newPassword,
+    oldUserPasswordHash,
+  );
+
+  return isIdenticalPassword;
+};
+
 const userModel = mongoose.model("User", userSchema);
 
 module.exports = userModel;
