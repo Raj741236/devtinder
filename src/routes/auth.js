@@ -7,7 +7,16 @@ const authRouter = express.Router();
 //SIGNUP
 
 authRouter.post("/signup", async (req, res) => {
-  const { firstName, lastName, emailId, password } = req.body;
+  const {
+    firstName,
+    lastName,
+    emailId,
+    password,
+    gender,
+    age,
+    photoUrl,
+    about,
+  } = req.body;
   try {
     //Encrypt the password
     const encryptPassword = await bcrypt.hash(password, 10);
@@ -17,6 +26,10 @@ authRouter.post("/signup", async (req, res) => {
       lastName,
       emailId,
       password: encryptPassword,
+      gender,
+      age,
+      photoUrl,
+      about,
     });
     await user.save();
     res.send("User created successfully");
@@ -42,10 +55,13 @@ authRouter.post("/login", async (req, res) => {
     } else {
       const jwtToken = await user.getJWT();
       res.cookie("token", jwtToken);
-      res.send("User logined successfully");
+      res.json({ message: "User logined successfully", data: user });
     }
   } catch (err) {
-    res.status(400).send("Error:" + err.message);
+    res.status(400).json({
+      message: err.message,
+      data: err,
+    });
   }
 });
 

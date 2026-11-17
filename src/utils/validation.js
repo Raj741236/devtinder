@@ -6,6 +6,9 @@ const validateUserEditFieldData = (req) => {
     "photoUrl",
     "about",
     "skills",
+    "age",
+    "gender",
+    "about",
   ];
 
   const isUserEditAllowed = Object.keys(req.body).every((field) =>
